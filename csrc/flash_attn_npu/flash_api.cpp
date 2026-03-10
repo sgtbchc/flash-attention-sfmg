@@ -1,7 +1,7 @@
 #include <torch/extension.h>
 
-#include "mha_fwd_kvcache.cpp"
-#include "tilingdata.h"
+//#include "mha_fwd_kvcache.cpp"
+//#include "tilingdata.h"
 #include "acl/acl.h"
 #include "tiling/platform/platform_ascendc.h"
 #include "mha_varlen_bwd.cpp"
@@ -372,6 +372,6 @@ mha_varlen_bwd(const at::Tensor &dout,                   // total_q x num_heads 
 PYBIND11_MODULE(flash_attn_2_cuda, m)
 {
     m.doc() = "FlashAttention";
-    m.def("fwd_kvcache", &mha_fwd_kvcache, "Forward pass, with KV-cache");
+//    m.def("fwd_kvcache", &mha_fwd_kvcache, "Forward pass, with KV-cache");
     m.def("varlen_bwd", &mha_varlen_bwd, "Backward pass (variable length)");
 }
