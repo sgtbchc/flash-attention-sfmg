@@ -2,10 +2,9 @@
 // Created by z00813531 on 2026/3/4.
 //
 
-#ifndef OPS_TRANSFORMER_SFMG_FLASH_ATTENTION_GRAD_CUSTOM_SFMG_H
-#define OPS_TRANSFORMER_SFMG_FLASH_ATTENTION_GRAD_CUSTOM_SFMG_H
+#ifndef FAG_SFMG_H
+#define FAG_SFMG_H
 
-#endif //OPS_TRANSFORMER_SFMG_FLASH_ATTENTION_GRAD_CUSTOM_SFMG_H
 
 //constexpr uint32_t ONE_BLK_SIZE = 32;
 constexpr uint32_t SOFTMAX_DEFAULT_BLK_SIZE = 32;
@@ -400,3 +399,4 @@ __aicore__ inline void SoftmaxGradFront(const LocalTensor<T>& dstTensor, const L
 }
 
 
+#endif //OPS_TRANSFORMER_SFMG_FLASH_ATTENTION_GRAD_CUSTOM_SFMG_H
