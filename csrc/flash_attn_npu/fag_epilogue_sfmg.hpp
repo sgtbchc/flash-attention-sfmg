@@ -21,6 +21,7 @@
 #include "fag_block.h"
 #include "kernel_operator.h"
 #include "fag_common/common_header.h"
+#include "fag_sfmg.h"
 
 using AscendC::CopyRepeatParams;
 using AscendC::DataCopyExtParams;
@@ -80,22 +81,22 @@ public:
         tilingDataU32.SetGlobalBuffer((__gm__ uint32_t *)tiling_in);;
         uint32_t coreNum = tilingDataU32.GetValue(TILING_CORE_NUM * CONST_2);
 
-        softmaxGradTilingData.srcM = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2);
-        softmaxGradTilingData.srcK = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2);
-        softmaxGradTilingData.srcSize = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 2);
-        softmaxGradTilingData.outMaxM = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 3);
-        softmaxGradTilingData.outMaxK = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 4);
-        softmaxGradTilingData.outMaxSize = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 5);
-        softmaxGradTilingData.splitM = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 6);
-        softmaxGradTilingData.splitK = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 7);
-        softmaxGradTilingData.splitSize = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 8);
-        softmaxGradTilingData.reduceM = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 9);
-        softmaxGradTilingData.reduceK = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 10);
-        softmaxGradTilingData.reduceSize = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 11);
-        softmaxGradTilingData.rangeM = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 12);
-        softmaxGradTilingData.tailM = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 13);
-        softmaxGradTilingData.tailSplitSize = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 14);
-        softmaxGradTilingData.tailReduceSize = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 15);
+//        softmaxGradTilingData.srcM = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2);
+//        softmaxGradTilingData.srcK = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2);
+//        softmaxGradTilingData.srcSize = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 2);
+//        softmaxGradTilingData.outMaxM = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 3);
+//        softmaxGradTilingData.outMaxK = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 4);
+//        softmaxGradTilingData.outMaxSize = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 5);
+//        softmaxGradTilingData.splitM = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 6);
+//        softmaxGradTilingData.splitK = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 7);
+//        softmaxGradTilingData.splitSize = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 8);
+//        softmaxGradTilingData.reduceM = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 9);
+//        softmaxGradTilingData.reduceK = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 10);
+//        softmaxGradTilingData.reduceSize = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 11);
+//        softmaxGradTilingData.rangeM = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 12);
+//        softmaxGradTilingData.tailM = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 13);
+//        softmaxGradTilingData.tailSplitSize = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 14);
+//        softmaxGradTilingData.tailReduceSize = tilingDataU32.GetValue(TILING_SOFTMAX_GRAD_TILING_DATA * CONST_2 + 15);
 
         // 计算 buffer 大小
         constexpr static uint32_t inputBufferLen = 24 * 1024; // castBuffer 24K*2=48K
@@ -285,9 +286,9 @@ public:
 
                 bool isBasicBlock = (nBurst % SFMG_HIGH_PERF_N_FACTOR == 0) && (dAlign % SFMG_HIGH_PERF_D_FACTOR == 0);
                 if (likely(isBasicBlock)) {
-                    AscendC::SoftmaxGradFront<float, true>(outputBuf, sfmgClc1, sfmgClc2, tempBuf, softmaxGradTilingData);
+                    SoftmaxGradFront<float, true>(outputBuf, sfmgClc1, sfmgClc2, tempBuf);
                 } else {
-                    AscendC::SoftmaxGradFront<float, false>(outputBuf, sfmgClc1, sfmgClc2, tempBuf, softmaxGradTilingData);
+                    SoftmaxGradFront<float, false>(outputBuf, sfmgClc1, sfmgClc2, tempBuf);
                 }
                 AscendC::PipeBarrier<PIPE_V>();
 
