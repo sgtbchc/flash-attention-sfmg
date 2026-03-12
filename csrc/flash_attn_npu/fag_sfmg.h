@@ -6,17 +6,62 @@
 #define FAG_SFMG_H
 
 
-//constexpr uint32_t ONE_BLK_SIZE = 32;
-constexpr uint32_t SOFTMAX_DEFAULT_BLK_SIZE = 32;
-//const int32_t ONE_BYTE_BIT_SIZE = 8;
-//constexpr uint8_t SOFTMAX_COMPUTE_DIM = 2;
-//constexpr uint8_t SOFTMAXGRAD_COMPUTE_DIM = 3;
-const int32_t ONE_REPEAT_BYTE_SIZE = 256;
-//constexpr uint8_t SOFTMAX_BASIC_TILE_NUM = 8;
-//const int32_t DEFAULT_BLOCK_SIZE = 256;
-//const uint8_t B16_BYTE_SIZE = 2;
-//const uint8_t B32_BYTE_SIZE = 4;
-//const int32_t DEFAULT_C0_SIZE = 32;
+
+// constexpr uint32_t SOFTMAX_DEFAULT_BLK_SIZE = 32;
+
+// const int32_t ONE_REPEAT_BYTE_SIZE = 256;
+constexpr AscendC::RoundMode FLOAT2HALF_ROUND_MODE = AscendC::RoundMode::CAST_NONE;
+using AscendC::B16_BYTE_SIZE;
+using AscendC::B32_BYTE_SIZE;
+using AscendC::BRCB_BROADCAST_NUMBER;
+using AscendC::BrcbRepeatParams;
+using AscendC::DEFAULT_BLK_NUM;
+using AscendC::DEFAULT_BLK_STRIDE;
+using AscendC::DEFAULT_BLOCK_SIZE;
+using AscendC::DEFAULT_C0_SIZE;
+using AscendC::DEFAULT_REPEAT_STRIDE;
+using AscendC::DivCeil;
+using AscendC::FLOAT_NUM_PER_BLK;
+using AscendC::FLOAT_REPEAT_SIZE;
+using AscendC::HALF_FACTOR;
+using AscendC::HALF_REPEAT_STRIDE;
+using AscendC::HardEvent;
+using AscendC::LastAxisShapeND;
+using AscendC::LocalTensor;
+using AscendC::MASK_PLACEHOLDER;
+using AscendC::MaskMode;
+using AscendC::MAX_REPEAT_TIMES;
+using AscendC::ONE_BLK_SIZE;
+using AscendC::ONE_BYTE_BIT_SIZE;
+using AscendC::PipeBarrier;
+using AscendC::ResetMask;
+using AscendC::RoundMode;
+using AscendC::SCALAR_STACK_DEPTH;
+using AscendC::SetFlag;
+using AscendC::SetMaskCount;
+using AscendC::SetMaskNorm;
+using AscendC::SetVectorMask;
+using AscendC::ShapeInfo;
+using AscendC::SOFTMAX_BASIC_TILE_NUM;
+using AscendC::SOFTMAX_COMPUTE_DIM;
+using AscendC::SOFTMAXGRAD_COMPUTE_DIM;
+using AscendC::WaitFlag;
+
+struct ReduceLastND {
+    uint32_t originalSrcM;
+    uint32_t originalSrcK;
+    uint32_t srcM;
+    uint32_t srcK;
+    uint32_t dstM;
+    uint32_t dstK;
+};
+
+struct SoftMaxShapeInfo {
+    uint32_t srcM{ 0 };
+    uint32_t srcK{ 0 };
+    uint32_t oriSrcM{ 0 };
+    uint32_t oriSrcK{ 0 };
+};
 
 /*!
  * \ingroup SoftmaxGradFront
