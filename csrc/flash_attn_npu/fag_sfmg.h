@@ -172,16 +172,24 @@ __aicore__ inline void CustomReduceSumLastNDImpl(const LocalTensor<float>& dst, 
 {
     const uint32_t splitCount = reduceParam.originalSrcK / FLOAT_REPEAT_SIZE;
     const uint32_t tailSrcK = reduceParam.originalSrcK % FLOAT_REPEAT_SIZE;
+
     if (splitCount > 0) {
+        /* tip
+         *  split count >0 说明每一行至少有一个完整的repeat，所以下面的处理的就是aligned对齐的部分
+         */
         CustomAlignedReduceSumNDImpl(tmpTensor, src, dst, reduceParam, splitCount);
     }
 
+
     if (tailSrcK != 0) {
+        // TIP 这里来处理尾块
         CustomReduceSumLastNDSplitImpl(dst, src, reduceParam, tailSrcK, 1, splitCount);
         PipeBarrier<PIPE_V>();
         if (splitCount == 0) {
+            // tip 如果splitCount == 0 说明没有aligned对齐的部分，那么直接将tmpTensor中的数据拷贝到dst中
             DataCopy(tmpTensor, dst, { 1, (uint16_t)reduceParam.srcM, 0, 0 });
         } else {
+            // tip 反之说明有对齐的块，那就需要先用ADD把他们先加到一起
             SetMaskCount();
             SetVectorMask<float, MaskMode::COUNTER>(0, reduceParam.srcM * FLOAT_NUM_PER_BLK);
             Add<float, false>(tmpTensor, tmpTensor, dst, MASK_PLACEHOLDER, 1,
